@@ -6,11 +6,13 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use InvalidArgumentException;
 use ElegenceIO\Support\Types\Reflection;
+use ElegenceIO\Containers\Components\Resolver;
+use ElegenceIO\Containers\Components\Writer;
 
 class Container implements ContainerInterface
 {
-    use Setters;
-    use Getter;
+    use Resolver;
+    use Writer;
     protected array $instances = [];
     protected array $bindings = [];
     protected array $locks = [];
