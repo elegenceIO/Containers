@@ -4,7 +4,6 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-            "ElegenceIO\\Containers\\": "src/"
         }
     },
     "authors": [
