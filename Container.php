@@ -14,11 +14,12 @@ class Container implements Makable
 {
     protected array $instances = [];
     protected array $bindings = [];
-    public array $locks = [];
+    protected array $locks = [];
     protected array $alias = [];
     protected array $overrides = [];
-    private ?AutoWirer $autowire = null;
-    private array $make = [];
+    protected ?AutoWirer $autowire = null;
+    protected array $make = [];
+    protected array $tag = [];
     use Resolver;
     use Register;
 
@@ -40,17 +41,18 @@ class Container implements Makable
      */
     public function bind(string $abstract, mixed $concrete = null):void
     {
-    $this->rejectClosure($abstract,$concrete);
-    
-    match (true) {
+        
+        $this->make[$abstract] = true;
+        $this->rejectClosure($abstract,$concrete);
+        match (true) {
         ($concrete === null) => $this->setClass($abstract),
         // ($concrete instanceof \Closure) => throw new InvalidArgumentException("Closures are not permitted in bind() for [$abstract]. Use singleton() instead."),
         (interface_exists($abstract) && (!is_null($concrete))) => $this->setInterface($abstract, $concrete),
+        // (\is_string($concrete) && !\interface_exists($concrete)) => $this->alias($abstract, $concrete),
         (\is_object($concrete)) => $this->setObject($abstract,$concrete),
-        (\is_string($concrete) && !\interface_exists($concrete)) => $this->alias($abstract, $concrete),
         default => $this->setDefault($abstract, $concrete),
+    
 };
-
         // return new Bond($this, $abstract);
     }
 
@@ -80,10 +82,10 @@ class Container implements Makable
      */
     public function get(string $abstract): mixed
     {
-
         if (!isset($this->make[$abstract]) || $this->make[$abstract] !== true) {
             throw new Exception("Cannot get a container without make() method");
         }
+
         // Set the Binding;
         $binding = $this->bindings[$abstract];
         // Resolv Binding
@@ -92,11 +94,7 @@ class Container implements Makable
 
     public function make(string $abstract, mixed $callback=null)
     {
-
-       
         if ($this->has($abstract)) {
-            
-            $this->make[$abstract] = true;
              $abstract = $this->resolveAlias($abstract);
              $this->resolveInterfaces($abstract);
             return $this->get($abstract);
