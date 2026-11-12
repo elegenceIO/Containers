@@ -47,10 +47,6 @@ trait Register
      */
     protected function setDefault(string $abstract, mixed $concrete):mixed
     {
-        if(\interface_exists($concrete) || $abstract instanceof $concrete)
-        {
-            throw new Exception("Cannot bind a default value");
-        }
         return $this->bindings[$abstract] = $concrete;
     }
 
@@ -62,7 +58,7 @@ trait Register
         }
 
     }
-    
+
     protected function throwInvalidArgumentException(string $abstract, mixed $concrete):void
     {
         throw new InvalidArgumentException(

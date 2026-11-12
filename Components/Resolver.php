@@ -27,6 +27,13 @@ trait Resolver
         return $abstract;
     }
 
+    public function getmakes()
+    {
+        echo "<pre>";
+        \var_dump($this->make);
+        echo "</pre>";
+    }
+
     protected function resolveInterfaces(mixed $abstract)
     {
         // Obtain the Key Values of the  $abstract class;
