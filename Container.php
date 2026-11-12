@@ -14,12 +14,9 @@ class Container implements Makable
 {
     protected array $instances = [];
     protected array $bindings = [];
-    protected array $locks = [];
     protected array $alias = [];
-    protected array $overrides = [];
     protected ?AutoWirer $autowire = null;
     protected array $make = [];
-    protected array $tag = [];
     use Resolver;
     use Register;
 
@@ -27,8 +24,6 @@ class Container implements Makable
     {
         $this->autowire = new AutoWirer($this);
     }
-
-
 
     /**
      * public @method bind()
@@ -39,6 +34,7 @@ class Container implements Makable
      * @description Support abstract types of class string and interfaces, concrete accepts class objects and strings
      * @description rejects closures use singleton methhod for factory instances
      */
+    
     public function bind(string $abstract, mixed $concrete = null):void
     {
         
@@ -56,8 +52,10 @@ class Container implements Makable
         // return new Bond($this, $abstract);
     }
 
-    public function singleton(string $abstract, callable $concrete): void
+    public function bindFactory(string $abstract, callable $concrete): void
     {
+        
+        $this->make[$abstract] = true;
         $this->bindings[$abstract] = function () use ($concrete, $abstract) {
             return $this->instances[$abstract] ??= $concrete($this);
         };
@@ -103,5 +101,19 @@ class Container implements Makable
         return $this->autowire($abstract, $callback);
         }
     }
+
+    public function remove(string ...$abstracts)
+    {
+        foreach($abstracts as $abstract){
+            if($this->has($abstract))
+            {
+                unset($this->make[$abstract]);
+                unset($this->bindings[$abstract]);
+                unset($this->alias[$abstract]);
+                unset($this->instances[$abstract]);
+            }
+        }
+    }
+
 
 }
